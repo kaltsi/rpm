@@ -2360,6 +2360,12 @@ rpmRC processBinaryFiles(rpmSpec spec, rpmBuildPkgFlags pkgFlags,
     Package pkg;
     rpmRC rc = RPMRC_OK;
     char *buildroot;
+    int stop_processing = rpmExpandNumeric("%{?_skip_install_processing}");
+
+    if (stop_processing) {
+      rpmlog(RPMLOG_NOTICE, _("Skip processing files\n"));
+      return rc;
+    }
     
     check_fileList = newStringBuf();
     buildroot = rpmGenPath(spec->rootDir, spec->buildRoot, NULL);
