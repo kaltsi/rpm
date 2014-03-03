@@ -17,9 +17,15 @@ Name: rpm-python
 Version: 4.9.1.2
 Release: 18
 BuildRequires: python-devel
-# This includes the Source0 => END_OF_INCLUDE_IN_PYTHON_SPEC lines from the main spec file
-%{expand:%(sed -n -e '/^Source0:/,/^##END_OF_INCLUDE_IN_PYTHON_SPEC##/p' <%_sourcedir/rpm.spec)}
-Source100: rpm.spec
+Source0: %{name}-%{version}.tar.bz2
+Source1: libsymlink.attr
+Group: System/Base
+Url: http://www.rpm.org/
+# See also https://github.com/mer-packages/rpm/
+
+# Partially GPL/LGPL dual-licensed and some bits with BSD
+# SourceLicense: (GPLv2+ and LGPLv2+ with exceptions) and BSD
+License: GPLv2+
 Requires: coreutils
 Requires: db4-utils
 Requires: popt >= 1.10.2.1
@@ -56,8 +62,32 @@ package consists of an archive of files along with information about
 the package like its version, a description, etc.
 
 %prep
-# This includes the %%prep section from the main spec file
-%{expand:%(sed -n -e '/^%%prep/,/^%%install/p' <%_sourcedir/rpm.spec | sed -e '1d' -e '$d')}
+%setup -q  -n %{name}-%{version}/src
+
+%build
+CPPFLAGS="$CPPFLAGS `pkg-config --cflags nss`"
+CFLAGS="$RPM_OPT_FLAGS"
+export CPPFLAGS CFLAGS LDFLAGS
+
+# Using configure macro has some unwanted side-effects on rpm platform
+# setup, use the old-fashioned way for now only defining minimal paths.
+autoreconf -i -f
+
+./configure \
+    --prefix=%{_usr} \
+    --sysconfdir=%{_sysconfdir} \
+    --localstatedir=%{_var} \
+    --sharedstatedir=%{_var}/lib \
+    --libdir=%{_libdir} \
+    --with-external-db \
+%if %{with python}
+    --enable-python \
+%endif
+    --with-lua \
+    --with-cap
+
+make %{?jobs:-j%jobs}
+
 %install
 rm -rf $RPM_BUILD_ROOT
 

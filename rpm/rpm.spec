@@ -5,24 +5,21 @@ Summary: The RPM package management system
 Name: rpm
 Version: 4.9.1.2
 Release: 18
-Source0: http://rpm.org/releases/rpm-4.9.x/rpm-%{version}.tar.bz2
+Source0: %{name}-%{version}.tar.gz
 Source1: libsymlink.attr
 Group: System/Base
 Url: http://www.rpm.org/
 # See also https://github.com/mer-packages/rpm/
 
-
-
 # Partially GPL/LGPL dual-licensed and some bits with BSD
 # SourceLicense: (GPLv2+ and LGPLv2+ with exceptions) and BSD 
 License: GPLv2+
-##END_OF_INCLUDE_IN_PYTHON_SPEC##
 
 Requires: curl
 Requires: coreutils
 Requires: db4-utils
 BuildRequires: db4-devel
-
+BuildRequires: doxygen
 BuildRequires: meego-rpm-config
 BuildRequires: autoconf
 BuildRequires: automake
@@ -167,9 +164,6 @@ done
 %find_lang %{name}
 # avoid dragging in tonne of perl libs for an unused script
 chmod 0644 $RPM_BUILD_ROOT/%{_libdir}/rpm/perldeps.pl
-
-# compress our ChangeLog, it's fairly big...
-# bzip2 -9 ChangeLog
 
 %clean
 rm -rf $RPM_BUILD_ROOT
