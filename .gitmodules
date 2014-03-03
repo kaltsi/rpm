@@ -1,0 +1,3 @@
+[submodule "upstream"]
+	path = upstream
+	url = http://rpm.org/git/rpm.git
